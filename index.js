@@ -4,6 +4,7 @@ const mongoose=require("mongoose");
 //créer un serveur API
 const express=require("express");//on va chercher la librairie express
 const app=express();//on initialise express dans la variable app, on crée une application express
+app.use(express.json())//accepte de recevoir du JSON
 const mongoDB="mongodb+srv://paulineadmin:Bm7g7y21FWxCkXHz@cluster0.ojrofc9.mongodb.net/Piiquante";
 mongoose.connect(mongoDB,{useNewUrlParser:true, useUnifiedTopology:true});
 const db = mongoose.connection;
@@ -49,6 +50,21 @@ app.get("/api/sauces/:id",async(req,res)=>{
     res.send(sauce);
     
 });
+
+app.post("/api/sauces",async(req,res)=>{
+    //récupérer les paramètre du corps/body
+    let body=req.body;
+    let sauce=await Sauce.create(body);
+    if(sauce){
+        res.send({
+            message: "Sauce créée"
+        })
+    }else{
+        res.send({
+            message: "Erreur de création"
+        })
+    }
+})
 app.listen(3000,()=>{
     console.log("serverlisten3000")
 }); //écoute tel port et lance-toi sur tel port, l'api se lance sur 8080
