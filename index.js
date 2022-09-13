@@ -40,6 +40,8 @@ app.get("/api/sauces",async(req,res)=>{
     res.send(sauces);
     //envoie ça à la response
 });
+
+//récupérer une sauce
 app.get("/api/sauces/:id",async(req,res)=>{
     let id= req.params.id //l'objet request, je prends les paramètres et je sélectionne l'id
     let sauce= await Sauce.findOne({
@@ -51,6 +53,7 @@ app.get("/api/sauces/:id",async(req,res)=>{
     
 });
 
+//création d'une sauce
 app.post("/api/sauces",async(req,res)=>{
     //récupérer les paramètre du corps/body
     let body=req.body;
@@ -62,6 +65,40 @@ app.post("/api/sauces",async(req,res)=>{
     }else{
         res.send({
             message: "Erreur de création"
+        })
+    }
+})
+app.put("/api/sauces/:id",async(req,res)=>{
+    let id= req.params.id; //récupération id
+    let body=req.body;//récupération info du body
+    let updatedSauce=await Sauce.updateOne({
+        _id: mongoose.Types.ObjectId(id)
+    },body);
+    if(updatedSauce){
+        res.send({
+            message: "Sauce mise à jour"
+        })
+    }else{
+        res.send({
+            message: "Erreur de mise à jour"
+        })
+    }
+})
+
+//suppression d'une sauce
+app.delete("/api/sauces/:id",async(req,res)=>{
+    let id= req.params.id; //récupération id
+    let deletedSauce= await Sauce.deleteOne({
+        _id: mongoose.Types.ObjectId(id)
+    });
+    //vérification
+    if(deletedSauce){
+        res.send({
+            message: "Sauce supprimée"
+        })
+    }else{
+        res.send({
+            message: "Erreur de suppression"
         })
     }
 })
