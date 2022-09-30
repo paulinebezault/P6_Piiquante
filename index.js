@@ -5,103 +5,19 @@ const mongoose=require("mongoose");
 const express=require("express");//on va chercher la librairie express
 const app=express();//on initialise express dans la variable app, on crée une application express
 app.use(express.json())//accepte de recevoir du JSON
+const routeSauce = require("./routes/sauce");
 const mongoDB="mongodb+srv://paulineadmin:Bm7g7y21FWxCkXHz@cluster0.ojrofc9.mongodb.net/Piiquante";
 mongoose.connect(mongoDB,{useNewUrlParser:true, useUnifiedTopology:true});
 const db = mongoose.connection;
 db.on("error",console.error.bind(console,"mongoDB connection error"));//alerte si on arrive pas à se connecter
-
-//création de schéma
-const sauceSchema = new mongoose.Schema({
-    //ici on détaille les différents champs du schema
-    userId: String,
-    name: String,
-    manufacturer: String,
-    description: String,
-    mainPepper: String,
-    imageUrl : String,
-    heat : Number,
-    likes : Number,
-    dislikes : Number
-}); //ce schéma là sera composé de ces champs là
-
-//création de modèle (liaison entre le schéma et une collection)
-const Sauce = mongoose.model("Sauce", sauceSchema);//liaison faite. ici S majuscule, convention dans ce cas
 
 //création d'une nouvelle sauce.
 /*const firstSauce = Sauce.create({
     name: "sauce n°1",
     description: "sauce à la tomate"
 });*/
+app.use("/api/sauces",routeSauce);//toutes les routes qui commences par "api/sauces" sont redirigées vers le fichiers routes sauce.js
 
-//première route de la base de donnée:
-app.get("/api/sauces",async(req,res)=>{
-    let sauces= await Sauce.find(); //récupère toutes les sauces dans la base de données
-    console.log(sauces);
-    res.send(sauces);
-    //envoie ça à la response
-});
-
-//récupérer une sauce
-app.get("/api/sauces/:id",async(req,res)=>{
-    let id= req.params.id //l'objet request, je prends les paramètres et je sélectionne l'id
-    let sauce= await Sauce.findOne({
-        //conditions de récupération
-        _id: mongoose.Types.ObjectId(id)//précise qu'on est dans un type objectId, façon dont mongoDB stocke
-    }); 
-    console.log(sauce);
-    res.send(sauce);
-    
-});
-
-//création d'une sauce
-app.post("/api/sauces",async(req,res)=>{
-    //récupérer les paramètre du corps/body
-    let body=req.body;
-    let sauce=await Sauce.create(body);
-    if(sauce){
-        res.send({
-            message: "Sauce créée"
-        })
-    }else{
-        res.send({
-            message: "Erreur de création"
-        })
-    }
-})
-app.put("/api/sauces/:id",async(req,res)=>{
-    let id= req.params.id; //récupération id
-    let body=req.body;//récupération info du body
-    let updatedSauce=await Sauce.updateOne({
-        _id: mongoose.Types.ObjectId(id)
-    },body);
-    if(updatedSauce){
-        res.send({
-            message: "Sauce mise à jour"
-        })
-    }else{
-        res.send({
-            message: "Erreur de mise à jour"
-        })
-    }
-})
-
-//suppression d'une sauce
-app.delete("/api/sauces/:id",async(req,res)=>{
-    let id= req.params.id; //récupération id
-    let deletedSauce= await Sauce.deleteOne({
-        _id: mongoose.Types.ObjectId(id)
-    });
-    //vérification
-    if(deletedSauce){
-        res.send({
-            message: "Sauce supprimée"
-        })
-    }else{
-        res.send({
-            message: "Erreur de suppression"
-        })
-    }
-})
 app.listen(3000,()=>{
     console.log("serverlisten3000")
 }); //écoute tel port et lance-toi sur tel port, l'api se lance sur 8080
