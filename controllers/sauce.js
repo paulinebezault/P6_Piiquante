@@ -1,3 +1,6 @@
+const mongoose=require("mongoose");
+const express = require("express");
+const app = express.Router();
 const Sauce = require("../models/sauce"); //on importe le modèle des sauces
 
 //première route de la base de donnée:
