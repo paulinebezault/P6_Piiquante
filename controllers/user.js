@@ -27,9 +27,16 @@ exports.signup = async (req, res, next) => { //fonction d'enregistrement des uti
 
 exports.login = async (req, res, next) => { //fonction de connexion d'utilisateurs enregistrés
     const signedUpUser = await user.findOne({ email: req.body.email });
-    const match = bcrypt.compare(req.body.password, hash, signedUpUser.password);
-    if (!match) {
-        return res.json({ message: 'Paire login/mot de passe incorrecte' });
+    console.log("user trouvé", signedUpUser);
+
+    if (!signedUpUser) {//on recherche la présence dans la base de donnée de l'email donné 
+        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });//si email pas trouvé
+    };
+
+    const passwordTested = await bcrypt.compare(req.body.password, signedUpUser.password); //on compare le mdp donné avec le hash de la base de donnée
+
+    if (!passwordTested) {
+        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
     } else {
         return res.json({
             userId: user._id,
@@ -38,7 +45,7 @@ exports.login = async (req, res, next) => { //fonction de connexion d'utilisateu
                 'RANDOM_TOKEN_SECRET', //clé secrète pour l'encodage
                 { expiresIn: '24h' } //durée de validité du token avant une reconnexion nécessaire
             )
-        });
+        })
     };
 };
 
