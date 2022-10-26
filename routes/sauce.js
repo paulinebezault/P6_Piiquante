@@ -1,22 +1,23 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 const express = require("express");
 const app = express.Router();
+const auth = require("../middleware/auth"); //importation middleware d'authentification, ajout AVANT les gestionnaires de routes
 const Sauce = require("../models/sauce");
 const saucesCtrl = require("../controllers/sauce");//importe le controller (route du fichier) et on le nomme saucesCtrl
 
 //première route de la base de donnée:
-app.get("/",saucesCtrl.getAllSauces);//on va chercher dans le fichier controller la fonction précise qu'on veut avec notation dot
+app.get("/", auth, saucesCtrl.getAllSauces);//on va chercher dans le fichier controller la fonction précise qu'on veut avec notation dot
 
 //récupérer une sauce
-app.get("/:id",saucesCtrl.getOneSauce);
+app.get("/:id", auth, saucesCtrl.getOneSauce);
 
 //création d'une sauce
-app.post("/",saucesCtrl.createSauce);
+app.post("/", auth, saucesCtrl.createSauce);
 
 //mise à jour d'une sauce
-app.put("/:id",saucesCtrl.updateSauce);
+app.put("/:id", auth, saucesCtrl.updateSauce);
 
 //suppression d'une sauce
-app.delete("/:id",saucesCtrl.deleteSauce);
+app.delete("/:id", auth, saucesCtrl.deleteSauce);
 
 module.exports = app;
