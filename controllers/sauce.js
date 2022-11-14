@@ -42,7 +42,7 @@ exports.createSauce = async (req, res) => {
         .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
         .catch(error => { res.status(400).json({ error }) })
 
-    if (sauce) {
+   /* if (sauce) {
         res.send({
             message: "Sauce créée"
         })
@@ -50,7 +50,7 @@ exports.createSauce = async (req, res) => {
         res.send({
             message: "Erreur de création"
         })
-    };
+    };*/
 };
 
 //mise à jour d'une sauce
