@@ -12,7 +12,9 @@ const sauceSchema = new mongoose.Schema({
     imageUrl : String,
     heat : Number,
     likes : Number,
-    dislikes : Number
+    dislikes : Number,
+    usersLiked: ["String <userId>"],
+    usersDisliked: ["String <userId>"]
 }); //ce schéma là sera composé de ces champs là
 
 sauceSchema.plugin(uniqueValidator); //ajout du plugin mongoose-unique-validator pour être sûr que mongoDB lise bien l'argument "unique"

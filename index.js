@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const express = require("express");//on va chercher la librairie express
 const app = express();//on initialise express dans la variable app, on crée une application express
 app.use(express.json())//accepte de recevoir du JSON
-const path = require('path'); //??
+const path = require('path'); 
 const routeSauce = require("./routes/sauce");
 const routeUser = require("./routes/user");
 const mongoDB = "mongodb+srv://paulineadmin:Bm7g7y21FWxCkXHz@cluster0.ojrofc9.mongodb.net/Piiquante";
@@ -25,11 +25,11 @@ app.use ((req,res,next) =>{ //middleware de correction d'erreur de CORS
     res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT, DELETE, PATCH, OPTIONS');//permet d'envoyer des requêtes avec les méthodes mentionnées
     next();
 });
-app.use('/images', express.static(path.join(__dirname, '/images')));//??
+app.use('/images', express.static(path.join(__dirname, '/images')));
 app.use("/api/sauces", routeSauce);//toutes les routes qui commences par "api/sauces" sont redirigées vers le fichiers routes sauce.js
 app.use("/api/auth", routeUser);
 
 
 app.listen(3000, () => {
     console.log("serverlisten3000")
-}); //écoute tel port et lance-toi sur tel port, l'api se lance sur 8080
+}); //écoute tel port et lance-toi sur tel port, l'api se lance sur 3000
