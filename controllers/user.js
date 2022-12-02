@@ -8,8 +8,7 @@ let user = require("../models/user");//attention à ne pas mettre en constante
 exports.signup = async (req, res, next) => { //fonction d'enregistrement des utilisateurs
     //hashage du mot de passe, fonction asynchrone
     const hash = await bcrypt.hash(req.body.password, 10);
-    console.log("mot de passe", req.body.password);
-    console.log("hashage", hash);
+    
 
     const newUser = new user({
         email: req.body.email,
@@ -19,15 +18,13 @@ exports.signup = async (req, res, next) => { //fonction d'enregistrement des uti
     newUser.save() //enregistrement dans la base de donnée
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
         .catch(error => res.status(400).json({ error }));
-
-    console.log("user créé", newUser);
     return; //éxecution de la fonction terminée
     //ajout de l'utilisateur à la base de donnée
 };
 
 exports.login = async (req, res, next) => { //fonction de connexion d'utilisateurs enregistrés
     const signedUpUser = await user.findOne({ email: req.body.email });
-    console.log("user trouvé", signedUpUser);
+    
 
     if (!signedUpUser) {//on recherche la présence dans la base de donnée de l'email donné 
         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });//si email pas trouvé

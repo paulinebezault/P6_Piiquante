@@ -21,4 +21,7 @@ app.put("/:id", auth, multer, saucesCtrl.updateSauce);
 //suppression d'une sauce
 app.delete("/:id", auth, saucesCtrl.deleteSauce);
 
+//like et dislike
+app.post("/:id/like", auth, saucesCtrl.likeDislike);
+
 module.exports = app;

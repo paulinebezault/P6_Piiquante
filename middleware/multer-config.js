@@ -20,17 +20,13 @@ const storage = multer.diskStorage({//objet de configuration de multer, indique 
     filename: (req, file, callback) => {// indique à multer comment renommer le fichier utilisé (pour ne pas avoir deux fichiers avec le même nom)
         const name = file.originalname.split(' ').join('_'); //on supprime les espaces dans le nom d'origine du fichier et on les remplace par des underscores
         const extension = MIME_TYPES[file.mimetype]; //on crée l'extension via l'élément du dictionnaire qui correspond au mime type du fichier envoyé par le frontend
-        console.log("mimetype",file.mimetype);
         callback(null, name + Date.now() + '.' + extension); //on indique avec null qu'il n'y a pas d'erreur,
         // name correspond au nom de fichier entier qu'on a créé juste au dessus, 
         //on lui rajoute un timestamp à la milliseconde près pour le rendre unique
         //on ajoute un point puis l'extention
-        console.log(name, "renommé");
-        console.log(extension, "extension modifiée");
     }
 }
 );
-console.log(storage, "nouvelle url complétée");
 
 module.exports = multer({ storage }).single('image'); //on exporte le middleware en appelant la méthode multer et en lui passant l'objet storage.
 // on indique qu'il s'agit d'un fichier unique (et pas d'un groupe de fichiers) avec la méthode single et qu'il s'agit d'un fichier image

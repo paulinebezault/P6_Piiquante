@@ -2,12 +2,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express.Router();
 const Sauce = require("../models/sauce"); //on importe le modèle des sauces
+let user = require("../models/user");
 const fs = require("fs");//donne accès aux fonctions qui permettent de modifier et supprimer les fichiers de la BDD
 
 //première route de la base de donnée:
 exports.getAllSauces = async (req, res) => {
     let saucesAll = await Sauce.find(); //récupère toutes les sauces dans la base de données
-    console.log("SECAUC",saucesAll);
+
     res.send(saucesAll);
     //envoie ça à la response
 };
@@ -19,17 +20,15 @@ exports.getOneSauce = async (req, res) => {
         //conditions de récupération
         _id: mongoose.Types.ObjectId(id)//précise qu'on est dans un type objectId, façon dont mongoDB stocke
     });
-    console.log("SAUCE",sauceObject);
+
     res.send(sauceObject);
 };
 
 //création d'une sauce
 exports.createSauce = async (req, res, next) => {
     //récupérer les paramètre du corps-body
-    /*let body = req.body;
-    let sauce = await Sauce.create(body);*/
-    const sauceObject = JSON.parse(req.body.sauce);
-    //express.JSON parse les objets JSON en string
+    //const sauceObject = JSON.parse(req.body.sauce); => express.JSON parse les objets JSON en string
+
     //on supprime _id et _userId de l'objet Sauce pour le remplacer par le _userId extrait du token d'auth
     delete sauceObject._id;
     delete sauceObject._userId;
@@ -41,23 +40,13 @@ exports.createSauce = async (req, res, next) => {
 
     newSauce.save()
         .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
-        .catch(error => { res.status(400).json({ error }) })
-
-   /* if (sauce) {
-        res.send({
-            message: "Sauce créée"
-        })
-    } else {
-        res.send({
-            message: "Erreur de création"
-        })
-    };*/
+        .catch(error => { res.status(400).json({ error }) });
 };
 
 //mise à jour d'une sauce
 exports.updateSauce = async (req, res) => {
     const sauceObject = req.file ?{//l'objet sauceObject regarde s'il y a un file dans la requête (req.file)  
-        ...JSON.parse(req.body.sauce), //S'il y en a un, on traite la nouvelle image, en lui ajoutant une nouvelle url
+        ...req.body.sauce, //S'il y en a un, on traite la nouvelle image, en lui ajoutant une nouvelle url
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {...req.body};//s'il n'y en a pas on traite simplement l'objet entrant
 
@@ -93,9 +82,9 @@ exports.updateSauce = async (req, res) => {
 
 //suppression d'une sauce
 exports.deleteSauce = async (req, res) => {
-    Sauce.findOne({_id: req.params.id})//on récupère l'objet en BDD
+    Sauce.findOne({_id: req.params.id})//on utilise l'ID reçu comme paramètre pour accéder à l'Objet correspondant dans la base de données
     .then(sauceObject => {
-        if (sauceObject.userId != req.auth.userId) {
+        if (sauceObject.userId != req.auth.userId) {//vérification que l'user faisant la requête est le propriétaire de l'objet
             res.status(401).json({message: 'Not authorized'});
         } else {
             const filename = sauceObject.imageUrl.split('/images/')[1];
@@ -109,8 +98,6 @@ exports.deleteSauce = async (req, res) => {
     .catch( error => {
         res.status(500).json({ error });
     });
-
-
    /* let id = req.params.id; //récupération id
     let deletedSauce = await Sauce.deleteOne({
         _id: mongoose.Types.ObjectId(id)
@@ -125,4 +112,22 @@ exports.deleteSauce = async (req, res) => {
             message: "Erreur de suppression"
         })
     }*/
+};
+
+exports.likeDislike = (req,res)=>{
+    Sauce.findOne({_id: req.params.id});// on récupère la sauce via son id
+    //on récupère l'userId dans le corps de la requete ?
+    const userId = user.findOne({userId: req.user._id});
+    
+    let usersLiked = new Array; //on crée les tableaux userLiked et userDisliked
+    let usersDisliked = new Array;
+    if (like = 1){ usersLiked.push(userId)};
+    if (like = -1){ usersDisliked.push(userId)};
+   /* if like = 1, userId dans userLiked
+    if like = -1, userId dans userDisliked
+    if like = 0, userId enlevé du tableau userliked ou userdisliked*/
+    
+   
+    //mise à jour du nombre total(rechargement de la page ?) à chaque notation
+
 };
