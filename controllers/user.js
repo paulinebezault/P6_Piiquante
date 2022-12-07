@@ -35,7 +35,7 @@ exports.login = async (req, res, next) => { //fonction de connexion d'utilisateu
     if (!passwordTested) {
         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
     } else {
-        return res.json({
+        return res.status(200).json({
             userId: user._id,
             token: jwt.sign(// on appelle la fonction sign de jwt avec les arguments suivant: payload (les données qu'on veut encoder)
                 { userId: user._id },// objet userId que la requête correspond à ce userId
