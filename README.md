@@ -1,4 +1,4 @@
-# OpenClassrooms Projet 6 - parcours développeur web d'OpenClassrooms
+# OpenClassrooms Projet 6 - parcours développeur web
 
 # Construisez une API sécurisée pour une application d'avis gastronomiques
 
