@@ -10,8 +10,11 @@ Le frontend est fourni.
 
 # Compétences développées :
 Mettre en œuvre des opérations CRUD de manière sécurisée ;
+
 Stocker des données de manière sécurisée ;
+
 Implémenter un modèle logique de données conformément à la réglementation ;
+
 
 Status : 1.0 terminée
 
