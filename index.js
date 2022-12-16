@@ -13,11 +13,6 @@ mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongoDB connection error"));//alerte si on arrive pas à se connecter
 
-//création d'une nouvelle sauce.
-/*const firstSauce = Sauce.create({
-    name: "sauce n°1",
-    description: "sauce à la tomate"
-});*/
 
 app.use ((req,res,next) =>{ //middleware de correction d'erreur de CORS
     res.setHeader('Access-Control-Allow-Origin', '*'); //accès autorisé à l'API depuis n'importe quelle origine

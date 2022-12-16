@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express.Router();
 const Sauce = require("../models/sauce"); //on importe le modèle des sauces
-let user = require("../models/user");
+let User = require("../models/user");
 const fs = require("fs");//donne accès aux fonctions qui permettent de modifier et supprimer les fichiers de la BDD
 
 //première route de la base de donnée:
@@ -64,20 +64,6 @@ exports.updateSauce = async (req, res) => {
         .catch((error) => {
             res.status(400).json({ error });
         });
-    /* let id = req.params.id; //récupération id
-     let body = req.body;//récupération info du body
-     let updatedSauce = await Sauce.updateOne({
-         _id: mongoose.Types.ObjectId(id)
-     }, body);
-     if (updatedSauce) {
-         res.send({
-             message: "Sauce mise à jour"
-         })
-     } else {
-         res.send({
-             message: "Erreur de mise à jour"
-         })
-     }*/
 };
 
 //suppression d'une sauce
@@ -115,16 +101,93 @@ exports.deleteSauce = async (req, res) => {
 };
 
 exports.likeDislike = (req, res, next) => {
-    let like = req.body.like; //on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
+    const like = req.body.like;//on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
+    console.log(like, "le nombre du like");
+
+    const userId = req.auth.userId;//on récupère l'userId dans le corps de la requete 
+    console.log(userId, "l'id du user");
+
+    let sauceId = req.params.id;// on récupère la sauce via son id
+    console.log(sauceId, "l'id de la sauce");
+
+    // on récupère la sauce selectionnée
+    Sauce.findOne({ _id: sauceId })
+        .then(sauce => {
+            // on vérifie si l'userId est déjà dans un des 2 tableaux usersLiked/Disliked pour éviter de liker plusieurs fois 
+            let userLike = sauce.usersLiked.find(id => id === userId);
+            let userDislike = sauce.usersDisliked.find(id => id === userId);
+
+            switch (like) {
+                
+                case 1:// si like = 1, l'user aime
+                    
+                    if (!userLike) {// si l'user n'a pas encore liké
+                        Sauce.updateOne({ _id: sauceId },//on met à jour les tableaux présents dans le modèle de la sauce
+                            { $push: { usersLiked: userId }, $inc: { likes: +1 } }) //ajoute le userId au tableau usersLiked et incrémente le nombre de likes par 1
+
+                            .then(() => { res.status(200).json({ message: "A aimé" }) })
+                            .catch(error => res.status(401).json({ error }));
+                    };
+                    break;
+
+                // si like = 0, l'user annule son like
+                case 0:
+                    // si l'user a déjà liké, 
+                    // on retire le like et le userId du tableau 
+                    if (userLike) {
+                        sauce.usersLiked = sauce.usersLiked.filter(id => id !== userId);
+                        Sauce.updateOne({ _id: sauceId }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })
+                        //on met à jour le tableau en retirant l'userId et en retirant un like
+                            .then(() => { res.status(200).json({ message: "A annulé son like" }) })
+                            .catch(error => res.status(401).json({ error }));
+                        
+                    }
+                    // si l'user a déjà disliké, 
+                    // on retire le dislike et le userId du tableau
+                    else {
+                        
+                        if (userDislike) {
+                            sauce.usersDisliked = sauce.usersDisliked.filter(id => id !== userId);
+                            Sauce.updateOne({ _id: sauceId }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+                            .then(() => { res.status(200).json({ message: "A annulé son dislike" }) })
+                            .catch(error => res.status(401).json({ error }));
+                            
+                        }
+                    }
+                    break;
+                   
+        
+                // si like = -1, l'utilisateur n'aime pas
+                case -1:
+                    if (!userDislike) {
+                        Sauce.updateOne({ _id: sauceId },//on met à jour les tableaux présents dans le modèle de la sauce
+                            { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }) //ajoute le userId au tableau usersDisliked et incrémente le nombre de dislikes par 1
+
+                            .then(() => { res.status(200).json({ message: "A aimé" }) })
+                            .catch(error => res.status(401).json({ error }));
+
+                        break;
+                    }
+                // sauvegarde la sauce avec like/dislike modifiés
+                sauce.save()
+                    .then(() => res.status(201).json({ message: 'Avis sauvegardé !' }))
+                    .catch(error => res.status(400).json({ error }));
+
+            }
+        })
+        .catch(error => res.status(500).json({ error: error.message }))
+};
+    /*let like = req.body.like; //on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
     console.log(like, "le nombre du like");
     let userId = req.auth;//on récupère l'userId dans le corps de la requete 
     console.log(userId, "l'id du user");//me donne undefined
     let sauceId = req.params.id;// on récupère la sauce via son id
     console.log(sauceId, "l'id de la sauce");
+    
 
     switch (like) {
         case 1:
-            Sauce.updateOne({ _id: sauceId },
+            Sauce.updateOne({ _id: sauceId },//on met à jour les tableaux présents dans le modèle de la sauce
                 { $push: { usersLiked: userId }, $inc: { likes: +1 } }) //ajoute le userId au tableau usersLiked et incrémente le nombre de likes par 1
 
                 .then(() => { res.status(200).json({ message: "A aimé" }) })
@@ -132,15 +195,20 @@ exports.likeDislike = (req, res, next) => {
 
             break;
         case 0:
-
-           /* usersLiked.includes(userId);
-            .then(() => { res.status(200).json({ message: "A annulé son like" }) })
-                .catch(error => res.status(401).json({ error }));
-
-            usersDisliked.includes(userId);
-            .then(() => { res.status(200).json({ message: "A annulé son dislike" }) })
-                .catch(error => res.status(401).json({ error }));
-            break;*/
+            Sauce.findOne({ _id: sauceId })//on récupère la sauce liké
+                .then((sauce) => {//on vérifie dans les tableaux de cette sauce si le userId est déjà présent (en like ou en dislike)
+                    if (sauce.usersLiked.includes(userId)) {//si le tableau usersLiked de cette sauce contient le userId
+                        Sauce.updateOne({ _id: sauceId }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })//on met à jour le tableau en retirant l'userId et en retirant un like
+                            .then(() => { res.status(200).json({ message: "A annulé son like" }) })
+                            .catch(error => res.status(401).json({ error }));
+                    }
+                    if (sauce.usersDisliked.includes(userId)) {//même chose dans tableau usersDisliked
+                        Sauce.updateOne({ _id: sauceId }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
+                            .then(() => { res.status(200).json({ message: "A annulé son dislike" }) })
+                            .catch(error => res.status(401).json({ error }));
+                    }
+                });
+            break;
 
         case -1:
 
@@ -150,8 +218,8 @@ exports.likeDislike = (req, res, next) => {
                 .catch(error => res.status(401).json({ error }));
 
             break;
-    };
-};
+    };*/
+
 
     //mise à jour du nombre total(rechargement de la page ?) à chaque notation
 

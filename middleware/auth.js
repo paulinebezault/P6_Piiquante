@@ -7,6 +7,7 @@ module.exports = (req, res, next) => { //on exporte notre fonction middleware
         const decodedToken = jwt.verify(token,'RANDOM_TOKEN_SECRET'); //on décode le token récupéré, si erreur on passe dans le catch
         console.log(decodedToken,"token décodé");
         const userId = decodedToken.userId; //on récupère le userId
+        console.log(userId,"userid token récup");
         req.auth = {//création objet auth  avec un champ userID, dans objet req
             userId: userId //on rajoute cette valeur à l'objet req qui lui va être transmis aux routes utilisées par la suite
         };
@@ -16,3 +17,14 @@ module.exports = (req, res, next) => { //on exporte notre fonction middleware
 
     }
 };
+/*
+app.use(function(req,res,next) {
+    jwt.verify(req.cookies['token'], 'YOUR_SECRET', function(err, decodedToken) {
+      if(err) { /* handle token err }
+      else {
+       req.userId = decodedToken.id;   // Add to req object
+       next();
+      }
+    });
+   });*/
+   
