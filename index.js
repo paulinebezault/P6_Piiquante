@@ -15,9 +15,12 @@ db.on("error", console.error.bind(console, "mongoDB connection error"));//alerte
 
 
 app.use ((req,res,next) =>{ //middleware de correction d'erreur de CORS
-    res.setHeader('Access-Control-Allow-Origin', '*'); //accès autorisé à l'API depuis n'importe quelle origine
-    res.setHeader('Access-Control-Allow-Headers','Origin,X-Requested-With, Content, Accept, Content-Type, Authorization');//ajoute les headers mentionnés aux requêtes envoyées vers notre API
-    res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT, DELETE, PATCH, OPTIONS');//permet d'envoyer des requêtes avec les méthodes mentionnées
+    //accès autorisé à l'API depuis n'importe quelle origine
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
+    //ajoute les headers mentionnés aux requêtes envoyées vers notre API
+    res.setHeader('Access-Control-Allow-Headers','Origin,X-Requested-With, Content, Accept, Content-Type, Authorization');
+    //permet d'envoyer des requêtes avec les méthodes mentionnées
+    res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT, DELETE, PATCH, OPTIONS');
     next();
 });
 app.use('/images', express.static(path.join(__dirname, '/images')));

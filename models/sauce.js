@@ -17,8 +17,7 @@ const sauceSchema = new mongoose.Schema({
     usersDisliked: ["String <userId>"]
 }); //ce schéma là sera composé de ces champs là
 
-sauceSchema.plugin(uniqueValidator); //ajout du plugin mongoose-unique-validator pour être sûr que mongoDB lise bien l'argument "unique"
-//s'assure que deux utilisateurs ne peuvent pas utiliser la même adresse email
+sauceSchema.plugin(uniqueValidator); 
 
 //création de modèle (liaison entre le schéma et une collection)
 module.exports = mongoose.model("Sauce", sauceSchema); //on exporte le modèle 

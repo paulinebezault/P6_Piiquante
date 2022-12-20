@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken"); //on importe jsonwebtoken
 module.exports = (req, res, next) => { //on exporte notre fonction middleware
     //récupération, décodage et vérification du token, transmission aux autres middleware et gestionnaires de routes
     try {
-        const token = req.headers.authorization.split(' ')[1];//on split le header pour enlever la première partie 'bearer' et ne garder que la deuxième partie du token
+        //on split le header pour enlever la première partie 'bearer' et ne garder que la deuxième partie du token
+        const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token,'RANDOM_TOKEN_SECRET'); //on décode le token récupéré, si erreur on passe dans le catch
         console.log(decodedToken,"token décodé");
         const userId = decodedToken.userId; //on récupère le userId
@@ -17,14 +18,3 @@ module.exports = (req, res, next) => { //on exporte notre fonction middleware
 
     }
 };
-/*
-app.use(function(req,res,next) {
-    jwt.verify(req.cookies['token'], 'YOUR_SECRET', function(err, decodedToken) {
-      if(err) { /* handle token err }
-      else {
-       req.userId = decodedToken.id;   // Add to req object
-       next();
-      }
-    });
-   });*/
-   

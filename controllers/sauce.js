@@ -56,7 +56,8 @@ exports.updateSauce = async (req, res) => {
             if (updatedSauce.userId != req.auth.userId) {//si l'userId est différent(!=) du token, donc objet lui appartient pas
                 res.status(403).json({ message: 'Not authorized' });
             } else {// si l'objet appartient bien à user
-                Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })//on indique les éléments à mettre à jour, puis on les ajoute à sauceObject
+                Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                //on indique les éléments à mettre à jour, puis on les ajoute à sauceObject
                     .then(() => res.status(200).json({ message: 'Objet modifié!' }))
                     .catch(error => res.status(401).json({ error }));
             }
@@ -68,9 +69,11 @@ exports.updateSauce = async (req, res) => {
 
 //suppression d'une sauce
 exports.deleteSauce = async (req, res) => {
-    Sauce.findOne({ _id: req.params.id })//on utilise l'ID reçu comme paramètre pour accéder à l'Objet correspondant dans la base de données
+    Sauce.findOne({ _id: req.params.id })
+    //on utilise l'ID reçu comme paramètre pour accéder à l'Objet correspondant dans la base de données
         .then(sauceObject => {
-            if (sauceObject.userId != req.auth.userId) {//vérification que l'user faisant la requête est le propriétaire de l'objet
+            //vérification que l'user faisant la requête est le propriétaire de l'objet
+            if (sauceObject.userId != req.auth.userId) {
                 res.status(401).json({ message: 'Not authorized' });
             } else {
                 const filename = sauceObject.imageUrl.split('/images/')[1];
@@ -84,27 +87,13 @@ exports.deleteSauce = async (req, res) => {
         .catch(error => {
             res.status(500).json({ error });
         });
-    /* let id = req.params.id; //récupération id
-     let deletedSauce = await Sauce.deleteOne({
-         _id: mongoose.Types.ObjectId(id)
-     });
-     //vérification
-     if (deletedSauce) {
-         res.send({
-             message: "Sauce supprimée"
-         })
-     } else {
-         res.send({
-             message: "Erreur de suppression"
-         })
-     }*/
 };
 
 exports.likeDislike = (req, res, next) => {
     const like = req.body.like;//on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
     console.log(like, "le nombre du like");
 
-    const userId = req.auth.userId;//on récupère l'userId dans le corps de la requete 
+    const userId = req.auth.userId;//on récupère l'userId via le middleware auth
     console.log(userId, "l'id du user");
 
     let sauceId = req.params.id;// on récupère la sauce via son id
@@ -177,49 +166,4 @@ exports.likeDislike = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error: error.message }))
 };
-    /*let like = req.body.like; //on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
-    console.log(like, "le nombre du like");
-    let userId = req.auth;//on récupère l'userId dans le corps de la requete 
-    console.log(userId, "l'id du user");//me donne undefined
-    let sauceId = req.params.id;// on récupère la sauce via son id
-    console.log(sauceId, "l'id de la sauce");
-    
-
-    switch (like) {
-        case 1:
-            Sauce.updateOne({ _id: sauceId },//on met à jour les tableaux présents dans le modèle de la sauce
-                { $push: { usersLiked: userId }, $inc: { likes: +1 } }) //ajoute le userId au tableau usersLiked et incrémente le nombre de likes par 1
-
-                .then(() => { res.status(200).json({ message: "A aimé" }) })
-                .catch(error => res.status(401).json({ error }));
-
-            break;
-        case 0:
-            Sauce.findOne({ _id: sauceId })//on récupère la sauce liké
-                .then((sauce) => {//on vérifie dans les tableaux de cette sauce si le userId est déjà présent (en like ou en dislike)
-                    if (sauce.usersLiked.includes(userId)) {//si le tableau usersLiked de cette sauce contient le userId
-                        Sauce.updateOne({ _id: sauceId }, { $pull: { usersLiked: userId }, $inc: { likes: -1 } })//on met à jour le tableau en retirant l'userId et en retirant un like
-                            .then(() => { res.status(200).json({ message: "A annulé son like" }) })
-                            .catch(error => res.status(401).json({ error }));
-                    }
-                    if (sauce.usersDisliked.includes(userId)) {//même chose dans tableau usersDisliked
-                        Sauce.updateOne({ _id: sauceId }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } })
-                            .then(() => { res.status(200).json({ message: "A annulé son dislike" }) })
-                            .catch(error => res.status(401).json({ error }));
-                    }
-                });
-            break;
-
-        case -1:
-
-            Sauce.updateOne({ _id: sauceId },
-                { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }) //ajoute le userId au tableau usersDisliked et incrémente le nombre de dislikes par 1
-                .then(() => { res.status(200).json({ message: "N'a pas aimé" }) })
-                .catch(error => res.status(401).json({ error }));
-
-            break;
-    };*/
-
-
-    //mise à jour du nombre total(rechargement de la page ?) à chaque notation
 
