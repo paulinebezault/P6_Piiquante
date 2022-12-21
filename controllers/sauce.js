@@ -91,13 +91,11 @@ exports.deleteSauce = async (req, res) => {
 
 exports.likeDislike = (req, res, next) => {
     const like = req.body.like;//on récupère le nombre(en string) du like depuis le corps de la requête, on l'utilise ensuite avec switch
-    console.log(like, "le nombre du like");
-
+   
     const userId = req.auth.userId;//on récupère l'userId via le middleware auth
-    console.log(userId, "l'id du user");
-
+    
     let sauceId = req.params.id;// on récupère la sauce via son id
-    console.log(sauceId, "l'id de la sauce");
+   
 
     // on récupère la sauce selectionnée
     Sauce.findOne({ _id: sauceId })

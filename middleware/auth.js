@@ -5,11 +5,9 @@ module.exports = (req, res, next) => { //on exporte notre fonction middleware
     try {
         //on split le header pour enlever la première partie 'bearer' et ne garder que la deuxième partie du token
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token,'RANDOM_TOKEN_SECRET'); //on décode le token récupéré, si erreur on passe dans le catch
-        console.log(decodedToken,"token décodé");
+        const decodedToken = jwt.verify(token,'RANDOM_TOKEN_SECRET'); //on décode le token récupéré
         const userId = decodedToken.userId; //on récupère le userId
-        console.log(userId,"userid token récup");
-        req.auth = {//création objet auth  avec un champ userID, dans objet req
+              req.auth = {//création objet auth  avec un champ userID, dans objet req
             userId: userId //on rajoute cette valeur à l'objet req qui lui va être transmis aux routes utilisées par la suite
         };
         next();
